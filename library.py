@@ -79,3 +79,63 @@ class DropColumnsTransformer(BaseEstimator, TransformerMixin):
   def fit_transform(self, X, y= None):
     result = self.transform(X)
     return result
+
+  
+class Sigma3Transformer(BaseEstimator, TransformerMixin):
+  def __init__(self, target_column):  
+    self.target_column = target_column
+
+
+  def fit(self, X, y = None):
+    print("Warning: Sigma3Transformer(.fit does nothing.")
+    return X
+
+  def transform(self, X):
+    assert isinstance(X, pd.core.frame.DataFrame), f'Sigma3Transformer(.transform expected Dataframe but got {type(X)} instead.'
+    X_ = X.copy()
+    m = X_[self.target_column].mean()
+    #compute std of column - look for method
+    sigma = X_[self.target_column].std()
+    minb, maxb =  (m - 3*sigma, m+ 3*sigma)
+    X_[self.target_column] = X_[self.target_column].clip(lower=minb, upper=maxb)
+    return X_
+
+ 
+  def fit_transform(self, X, y = None):
+    result = self.transform(X)
+    return result
+  
+class TukeyTransformer(BaseEstimator, TransformerMixin):
+  def __init__(self, target_column, fence='outer'):
+    assert fence in ['inner', 'outer']
+    self.target_column = target_column
+    self.fence = fence
+
+  def fit(self, X, y = None):
+    print("Warning: TukeyTransformer(.fit does nothing.")
+    return X
+
+  def transform(self, X):
+    assert isinstance(X, pd.core.frame.DataFrame), f'TukeyTransformer(.transform expected Dataframe but got {type(X)} instead.'
+
+    X_ = X.copy()
+    #now add on outer fences
+    q1 = X_[  self.target_column ].quantile(0.25)
+    q3 = X_[  self.target_column ].quantile(0.75)
+    iqr = q3-q1
+    if (self.fence == 'inner'):
+        inner_low = q1-1.5*iqr  #??????? .5 works i guess?
+        inner_high = q3+1.5*iqr
+        X_[  self.target_column ] =  X_[self.target_column].clip(lower=inner_low, upper=inner_high)
+    else:
+      
+        outer_low = q1-3*iqr
+        outer_high = q3+3*iqr
+        X_[  self.target_column ] =  X_[self.target_column].clip(lower=outer_low, upper=outer_high)
+  
+    return X_
+
+ 
+  def fit_transform(self, X, y = None):
+    result = self.transform(X)
+    return result
