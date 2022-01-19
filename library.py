@@ -139,3 +139,35 @@ class TukeyTransformer(BaseEstimator, TransformerMixin):
   def fit_transform(self, X, y = None):
     result = self.transform(X)
     return result
+  
+class PearsonTransformer(BaseEstimator, TransformerMixin):
+  def __init__(self, threshold):
+    self.threshold = threshold
+
+
+  def fit(self, X, y = None):
+    print("Warning: PearsonTransformer.fit does nothing.")
+    return X
+
+  def transform(self, X):
+    assert isinstance(X, pd.core.frame.DataFrame), f'MappingTransformer.transform expected Dataframe but got {type(X)} instead.'
+   
+    X_ = X.copy()
+
+    X_ = X_.corr(method='pearson')
+    masked_df = X_.abs() > self.threshold
+    upper_mask = np.triu(masked_df , 1).astype(bool)
+
+    columns = np.transpose(upper_mask.nonzero()) 
+    correlated_columns = []
+   
+    [correlated_columns.append(masked_df.columns[item[1]]) for item in columns if masked_df.columns[item[1]] not in correlated_columns]
+    
+
+    new_df = masked_df.drop(columns=correlated_columns)
+
+    return new_df
+
+  def fit_transform(self, X, y = None):
+    result = self.transform(X)
+    return result
