@@ -171,3 +171,27 @@ class PearsonTransformer(BaseEstimator, TransformerMixin):
   def fit_transform(self, X, y = None):
     result = self.transform(X)
     return result
+
+class MinMaxTransformer(BaseEstimator, TransformerMixin):
+  def __init__(self):
+    pass
+  #fill in rest below
+  def transform(self, X):
+    Table = X.copy()
+    for col in X:
+      mi = Table[col].min()
+      mx = Table[col].max()
+      denom = (mx - mi)
+      Table[col] -= mi
+      Table[col] /=denom
+
+    return Table
+  
+  def fit(self, X, y = None): 
+    print("Warning:DropColumnsTransformer.fit does nothing.")
+    return X
+    
+
+  def fit_transform(self, X, y= None):
+    result = self.transform(X)
+    return result
