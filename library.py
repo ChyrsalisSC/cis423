@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
+from sklearn.impute import KNNImputer
 
 class MappingTransformer(BaseEstimator, TransformerMixin):
   
@@ -193,5 +194,30 @@ class MinMaxTransformer(BaseEstimator, TransformerMixin):
     
 
   def fit_transform(self, X, y= None):
+    result = self.transform(X)
+    return result
+
+
+class KNNTransformer(BaseEstimator, TransformerMixin):
+  def __init__(self,n_neighbors=5, weights="uniform", add_indicator=False):
+    self.n_neighbors = n_neighbors
+    self.weights=weights 
+    self.add_indicator=add_indicator
+
+  def fit(self, X, y = None):
+    print("Warning: KNNTransformer.fit does nothing.")
+    return X
+
+  def transform(self, X):
+    assert isinstance(X, pd.core.frame.DataFrame), f'KNNTransformer.transform expected Dataframe but got {type(X)} instead.'
+    X_ = X.copy()
+    cols = X_.columns
+    imputer = KNNImputer(n_neighbors =self.n_neighbors, weights = self.weights, add_indicator=False)
+    imputed_data = imputer.fit_transform(X_)
+    result = pd.DataFrame(imputed_data)
+    result.columns = cols 
+    return result
+    
+  def fit_transform(self, X, y = None):
     result = self.transform(X)
     return result
