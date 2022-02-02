@@ -221,3 +221,24 @@ class KNNTransformer(BaseEstimator, TransformerMixin):
   def fit_transform(self, X, y = None):
     result = self.transform(X)
     return result
+  
+def find_random_state(df, labels, n=200):
+  var = []  #collect test_error/train_error where error based on F1 score
+
+  #2 minutes
+  for i in range(1,n):
+      train_X, test_X, train_y, test_y = train_test_split(df, labels, test_size=0.2, shuffle=True,
+                                                      random_state=i, stratify=labels)
+      model.fit(train_X, train_y)  #train model
+      train_pred = model.predict(train_X)  #predict against training set
+      test_pred = model.predict(test_X)    #predict against test set
+      train_error = f1_score(train_y, train_pred)  #how bad did we do with prediction on training data?
+      test_error = f1_score(test_y, test_pred)     #how bad did we do with prediction on test data?
+      error_ratio = test_error/train_error        #take the ratio
+      var.append(error_ratio)
+
+  rs_value = sum(var)/len(var)
+  rs_value  #1.0024032354009096
+
+  idx = np.array(abs(var - rs_value)).argmin()  #find the index of the smallest value
+  return idx
