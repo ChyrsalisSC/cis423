@@ -265,3 +265,30 @@ customer_transformer = Pipeline(steps=[
     ('minmax', MinMaxTransformer()),
     ('imputer', KNNTransformer())
     ], verbose=True)
+
+
+def dataset_setup(feature_table, labels, the_transformer, rs=1234, ts=.2):
+    X_train, X_test, y_train, y_test = train_test_split(feature_table, labels, test_size=ts, shuffle=True,
+                                                    random_state=rs, stratify=labels)
+
+    X_train_transformed = the_transformer.fit_transform(X_train)
+    X_test_transformed = the_transformer.fit_transform(X_test)
+
+    x_trained_numpy = X_train_transformed.to_numpy()
+    x_test_numpy = X_test_transformed.to_numpy()
+    y_train_numpy = np.array(y_train)
+    y_test_numpy = np.array(y_test)
+ 
+    return  x_trained_numpy,  y_train_numpy,  x_test_numpy , y_test_numpy
+
+def titanic_setup(titanic_table, transformer=titanic_transformer, rs=88, ts=.2):
+    x_trained_numpy, y_train_numpy, x_test_numpy, y_test_numpy = dataset_setup(titanic_table.drop(columns='Survived'),
+                                                                           titanic_table['Survived'].to_list(),
+                                                                           titanic_transformer, rs, ts)
+    return x_trained_numpy, y_train_numpy, x_test_numpy, y_test_numpy
+  
+def customer_setup(customer_table, transformer=customer_transformer, rs=107, ts=.2):
+    x_trained_numpy, y_train_numpy, x_test_numpy, y_test_numpy = dataset_setup(customer_table.drop(columns='Rating'),
+                                                                           customer_table['Rating'].to_list(),
+                                                                           customer_transformer,rs, ts)
+    return x_trained_numpy, y_train_numpy, x_test_numpy, y_test_numpy
