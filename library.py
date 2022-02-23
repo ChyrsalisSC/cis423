@@ -8,6 +8,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import matthews_corrcoef
+from sklearn.linear_model import LogisticRegressionCV
 
 class MappingTransformer(BaseEstimator, TransformerMixin):
   
