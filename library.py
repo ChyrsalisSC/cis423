@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.impute import KNNImputer
@@ -10,6 +12,7 @@ from sklearn.model_selection import HalvingGridSearchCV
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.metrics import matthews_corrcoef
 from sklearn.linear_model import LogisticRegressionCV
+
 
 class MappingTransformer(BaseEstimator, TransformerMixin):
   
@@ -250,6 +253,34 @@ def find_random_state(df, labels, n=200):
 
   idx = np.array(abs(var - rs_value)).argmin()  #find the index of the smallest value
   return idx
+
+def heat_map(zipped, label_list=(0,1)):
+  zlist = list(zipped)
+  case_list = []
+  for i in range(len(label_list)):
+    inner_list = []
+    for j in range(len(label_list)):
+      inner_list.append(zlist.count((label_list[i], label_list[j])))
+    case_list.append(inner_list)
+
+
+  fig, ax = plt.subplots(figsize=(5, 5))
+  ax.imshow(case_list)
+  ax.grid(False)
+  title = ''
+  for i,c in enumerate(label_list):
+    title += f'{i}={c} '
+  ax.set_title(title)
+  ax.set_xlabel('Predicted outputs', fontsize=16, color='black')
+  ax.set_ylabel('Actual outputs', fontsize=16, color='black')
+  ax.xaxis.set(ticks=range(len(label_list)))
+  ax.yaxis.set(ticks=range(len(label_list)))
+  
+  for i in range(len(label_list)):
+      for j in range(len(label_list)):
+          ax.text(j, i, case_list[i][j], ha='center', va='center', color='white', fontsize=32)
+  plt.show()
+  return None
 
 
 titanic_transformer = Pipeline(steps=[
