@@ -13,6 +13,9 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 from sklearn.metrics import matthews_corrcoef
 from sklearn.linear_model import LogisticRegressionCV
 
+#added defaut model
+model = LogisticRegressionCV(random_state=1, max_iter=5000)
+
 
 class MappingTransformer(BaseEstimator, TransformerMixin):
   
