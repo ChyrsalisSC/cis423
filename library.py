@@ -308,6 +308,20 @@ customer_transformer = Pipeline(steps=[
     ('imputer', KNNTransformer())
     ], verbose=True)
 
+stroke_transformer = Pipeline(steps=[
+    ('drop', DropColumnsTransformer(['id'], 'drop')),                               
+    ('gender', MappingTransformer('gender', {'Male': 0, 'Female': 1})),
+    ('married', MappingTransformer('ever_married', {'No': 0, 'Yes': 1})),
+    ('smoking_status', MappingTransformer('smoking_status', {'never smoked': 0, 'formerly smoked': 1, 'smokes':2, 'Unknown': None})),
+    ('ohework', OHETransformer(target_column='work_type')),
+    ('oheres', OHETransformer(target_column='Residence_type')),
+    ('age', TukeyTransformer('age', 'outer')),
+    ('avg_glucose_level', TukeyTransformer('avg_glucose_level', 'outer')),
+    ('bmi', TukeyTransformer('bmi', 'outer')),
+    ('scale', MinMaxTransformer()), 
+    ('imputer', KNNTransformer())
+    ], verbose=True)
+
 
 def dataset_setup(feature_table, labels, the_transformer, rs=1234, ts=.2):
     X_train, X_test, y_train, y_test = train_test_split(feature_table, labels, test_size=ts, shuffle=True,
